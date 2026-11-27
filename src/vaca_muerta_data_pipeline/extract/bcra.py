@@ -1,6 +1,6 @@
 """Extract USD exchange rates from BCRA Estadisticas Cambiarias API"""
 
-from datetime import date
+from datetime import date, datetime, timezone
 from typing import Any
 
 import pandas as pd
@@ -60,3 +60,17 @@ def parse_usd_rates(payload: dict[str, Any]) -> pd.DataFrame:
     )[OUTPUT_COLUMNS]
     df["date"] = pd.to_datetime(df["date"], format="%Y-%m-%d")
     return df.sort_values("date").reset_index(drop=True)
+
+def extract_usd_rates(start: date, end: date) -> pd.DataFrame:
+    """Fetch and parse USD rates, adding the extraction timestamp.
+
+    Args:
+        start: First date of the range (inclusive).
+        end: Last date of the range (inclusive).
+
+    Returns:
+        Parsed rates with an extra extracted_at column in UTC.
+    """
+    df = parse_usd_rates(fetch_usd_rates(start, end))
+    df["extracted_at"] = datetime.now(timezone.utc)
+    return df    
