@@ -12,3 +12,5 @@ wheels/
 data/
 .env
 __pycache__/
+
+notebooks/
